@@ -6,11 +6,20 @@
 package vista;
 
 import controlador.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import javax.swing.JDesktopPane;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 import modelo.*;
 
 /**
@@ -23,11 +32,16 @@ public class RegistroPartida extends javax.swing.JInternalFrame {
      * Creates new form RegistroPartida
      */
     JDesktopPane escritorio;
-    DecimalFormat df = new DecimalFormat(".00");
-    SimpleDateFormat dt = new SimpleDateFormat("dd-MM-yyyy");
+    DecimalFormat df = new DecimalFormat("0.00");
+    SimpleDateFormat dt = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
     ControladorPartida cp;
     ControladorTransaccion ct;
     Partida pda;
+    Transaccion trn;
+    String elmt = "", cd = "";
+    DefaultTableModel modelo;
+    int cr = 0;
+    ArrayList<Transaccion> tran;
 
     public RegistroPartida(JDesktopPane es) {
         initComponents();
@@ -36,6 +50,28 @@ public class RegistroPartida extends javax.swing.JInternalFrame {
         cp = new ControladorPartida();
         ct = new ControladorTransaccion();
         pda = new Partida();
+        modelo();
+        tabla.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                Ver(e); //To change body of generated methods, choose Tools | Templates.
+            }
+
+        });
+    }
+
+    public void modelo() {
+        modelo = new DefaultTableModel();
+        modelo.addColumn("CODIGO");
+        modelo.addColumn("CUENTA");
+        modelo.addColumn("PARCIAL");
+        modelo.addColumn("DEBE");
+        modelo.addColumn("HABER");
+        tabla.setModel(modelo);
+    }
+
+    private void Ver(MouseEvent e) {
+        cd = String.valueOf(tabla.rowAtPoint(e.getPoint()));
     }
 
     /**
@@ -47,6 +83,7 @@ public class RegistroPartida extends javax.swing.JInternalFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        pmenu = new javax.swing.JPopupMenu();
         jPanel2 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
@@ -71,6 +108,7 @@ public class RegistroPartida extends javax.swing.JInternalFrame {
         jLabel10 = new javax.swing.JLabel();
         civa = new javax.swing.JComboBox<>();
         tiva = new javax.swing.JComboBox<>();
+        pm = new javax.swing.JPanel();
         jPanel4 = new javax.swing.JPanel();
         jPanel7 = new javax.swing.JPanel();
         bEliminar = new javax.swing.JButton();
@@ -98,7 +136,7 @@ public class RegistroPartida extends javax.swing.JInternalFrame {
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(236, 236, 236)
+                .addGap(254, 254, 254)
                 .addComponent(jLabel2)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -106,7 +144,7 @@ public class RegistroPartida extends javax.swing.JInternalFrame {
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 36, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -131,7 +169,18 @@ public class RegistroPartida extends javax.swing.JInternalFrame {
         jLabel5.setText("CUENTA #");
 
         tCuenta.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        tCuenta.setToolTipText("PRESIONE ENTER PARA ESTABLECER CUENTA");
         tCuenta.setEnabled(false);
+        tCuenta.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                tCuentaFocusLost(evt);
+            }
+        });
+        tCuenta.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                tCuentaKeyTyped(evt);
+            }
+        });
 
         bNueva.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
         bNueva.setText("NUEVA PARTIDA");
@@ -153,6 +202,7 @@ public class RegistroPartida extends javax.swing.JInternalFrame {
         jLabel6.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jLabel6.setText("CUENTA");
 
+        nCuenta.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         nCuenta.setEnabled(false);
         nCuenta.setFocusable(false);
 
@@ -166,6 +216,11 @@ public class RegistroPartida extends javax.swing.JInternalFrame {
 
         tMonto.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         tMonto.setEnabled(false);
+        tMonto.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                tMontoKeyTyped(evt);
+            }
+        });
 
         tColumna.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         tColumna.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "SELECCIONE", "PARCIAL", "DEBE", "HABER" }));
@@ -236,8 +291,8 @@ public class RegistroPartida extends javax.swing.JInternalFrame {
                     .addComponent(jLabel9))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(civa, 0, 145, Short.MAX_VALUE)
-                    .addComponent(tiva, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(civa, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(tiva, 0, 145, Short.MAX_VALUE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel6Layout.setVerticalGroup(
@@ -254,71 +309,77 @@ public class RegistroPartida extends javax.swing.JInternalFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        javax.swing.GroupLayout pmLayout = new javax.swing.GroupLayout(pm);
+        pm.setLayout(pmLayout);
+        pmLayout.setHorizontalGroup(
+            pmLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 161, Short.MAX_VALUE)
+        );
+        pmLayout.setVerticalGroup(
+            pmLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 100, Short.MAX_VALUE)
+        );
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
-                .addContainerGap()
+                .addGap(10, 10, 10)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(bNueva, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(bAgregar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addContainerGap())
+                        .addComponent(jLabel1)
+                        .addGap(6, 6, 6)
+                        .addComponent(tnpartida, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(6, 6, 6)
+                        .addComponent(jLabel4)
+                        .addGap(4, 4, 4)
+                        .addComponent(tfecha, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(4, 4, 4)
+                        .addComponent(jLabel5)
+                        .addGap(4, 4, 4)
+                        .addComponent(tCuenta, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(jLabel6, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addComponent(tnpartida, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jLabel4)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(tfecha, javax.swing.GroupLayout.PREFERRED_SIZE, 174, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(50, 50, 50)
-                                .addComponent(jLabel5)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(tCuenta, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(nCuenta))
-                        .addGap(18, 18, 18))))
+                        .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(6, 6, 6)
+                        .addComponent(nCuenta, javax.swing.GroupLayout.PREFERRED_SIZE, 467, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(42, 42, 42)
+                        .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(6, 6, 6)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(pm, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(bNueva)
+                    .addComponent(bAgregar, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE)))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(tCuenta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(tfecha, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 23, Short.MAX_VALUE))
-                    .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 23, Short.MAX_VALUE)
-                        .addComponent(tnpartida, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addGap(18, 18, 18)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(nCuenta, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(11, 11, 11)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGap(39, 39, 39)
-                        .addComponent(bNueva)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(bAgregar))
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGap(21, 21, 21)
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(tnpartida, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(tfecha, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(tCuenta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(nCuenta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(jPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addComponent(pm, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(5, 5, 5)
+                        .addComponent(bNueva)
+                        .addGap(11, 11, 11)
+                        .addComponent(bAgregar))))
         );
 
         jPanel4.setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -414,7 +475,6 @@ public class RegistroPartida extends javax.swing.JInternalFrame {
                 return canEdit [columnIndex];
             }
         });
-        tabla.setEnabled(false);
         jScrollPane1.setViewportView(tabla);
 
         jLabel11.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
@@ -476,11 +536,9 @@ public class RegistroPartida extends javax.swing.JInternalFrame {
                         .addGap(16, 16, 16)
                         .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel12)
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addContainerGap())
-                    .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addContainerGap())))
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(jPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -508,14 +566,14 @@ public class RegistroPartida extends javax.swing.JInternalFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(6, 6, 6)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
@@ -524,12 +582,23 @@ public class RegistroPartida extends javax.swing.JInternalFrame {
 
     private void bNuevaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bNuevaActionPerformed
         acciones(1, true);
+        tCuenta.requestFocus();
         numP();
+        pda = new Partida();
+        pda.setNumpartida(Integer.parseInt(tnpartida.getText()));
+        tran = new ArrayList();
     }//GEN-LAST:event_bNuevaActionPerformed
 
     private void bAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bAgregarActionPerformed
         if (validarA()) {
+            int idcta = Integer.parseInt(tCuenta.getText());
+            double mt = Double.parseDouble(tMonto.getText());
+            int op = tColumna.getSelectedIndex();
+            trn = new Transaccion(pda.getIdpartida(), idcta, mt, op);
+            agrtab(trn, 0);
+            agriva();
             acciones(3, true);
+            tCuenta.requestFocus();
         }
     }//GEN-LAST:event_bAgregarActionPerformed
 
@@ -547,7 +616,11 @@ public class RegistroPartida extends javax.swing.JInternalFrame {
     }//GEN-LAST:event_tivaItemStateChanged
 
     private void bEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bEliminarActionPerformed
-        // TODO add your handling code here:
+        if (cd != "") {
+            modelo.removeRow(Integer.parseInt(cd));
+            totales();
+            cr--;
+        }
     }//GEN-LAST:event_bEliminarActionPerformed
 
     private void bSalirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bSalirActionPerformed
@@ -556,13 +629,81 @@ public class RegistroPartida extends javax.swing.JInternalFrame {
 
     private void bGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bGuardarActionPerformed
         if (validarB()) {
+            Date f = tfecha.getDate();
+            Timestamp fts = new Timestamp(f.getYear(), f.getMonth(), f.getDay(), f.getHours(), f.getMinutes(), f.getSeconds(), f.getSeconds());
+            pda.setFecha(fts);
+            String cnc = tConcepto.getText();
+            pda.setConcepto(cnc);
+            boolean bb = cp.agregarPartida(pda);
+            Transaccion trt = null;
+            for (int i = 0; i < tran.size(); i++) {
+                trt = tran.get(i);
+                trt.setIdpartida(cp.idpart(pda));
+                ct.AgregarTransaccion(trt);
+            }
+            if(bb)
             acciones(4, false);
         }
     }//GEN-LAST:event_bGuardarActionPerformed
 
     private void bLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bLimpiarActionPerformed
         acciones(2, true);
+        tCuenta.requestFocus();
     }//GEN-LAST:event_bLimpiarActionPerformed
+
+    private void tCuentaFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_tCuentaFocusLost
+
+    }//GEN-LAST:event_tCuentaFocusLost
+
+    private void tMontoKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tMontoKeyTyped
+        char caracter = evt.getKeyChar();
+        boolean bo = false;
+        for (int i = 0; i < tMonto.getText().length(); i++) {
+            if (tMonto.getText().charAt(i) == '.') {
+                bo = true;
+            }
+        }
+        if ((caracter < '0' || caracter > '9') && caracter != '\b' && caracter != '.') {
+            evt.consume();  // ignorar el evento de teclado
+        }
+        if (bo && caracter == '.') {
+            evt.consume();  // ignorar el evento de teclado
+        }
+    }//GEN-LAST:event_tMontoKeyTyped
+
+    private void tCuentaKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_tCuentaKeyTyped
+        char caracter = evt.getKeyChar();
+        if (caracter < '0' || caracter > '9' && caracter != '\b') {
+            evt.consume();
+        }
+        if (evt.getKeyChar() != KeyEvent.VK_ENTER) {
+            nCuenta.setText("");
+            pmenu.removeAll();
+            bus(tCuenta.getText());
+            if ((evt.getKeyChar() > '0' || evt.getKeyChar() < '9')) {
+                pmenu.setVisible(false);
+                if (elmt != null) {
+                    pmenu.show(pm, evt.getKeyLocation(), evt.getKeyLocation());
+                    pmenu.setVisible(true);
+                    tCuenta.requestFocus();
+                }
+            }
+            if (evt.getKeyChar() == KeyEvent.VK_BACK_SPACE) {
+                pmenu.setVisible(false);
+                if (elmt != null) {
+                    pmenu.show(pm, evt.getKeyLocation(), evt.getKeyLocation());
+                    pmenu.setVisible(true);
+                    tCuenta.requestFocus();
+                }
+            }
+        } else {
+            if (cexiste(tCuenta.getText()) != "") {
+                nCuenta.setText(cexiste(tCuenta.getText()));
+            } else {
+                nCuenta.setText("");
+            }
+        }
+    }//GEN-LAST:event_tCuentaKeyTyped
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -594,6 +735,8 @@ public class RegistroPartida extends javax.swing.JInternalFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextField nCuenta;
+    private javax.swing.JPanel pm;
+    private javax.swing.JPopupMenu pmenu;
     private javax.swing.JComboBox<String> tColumna;
     private javax.swing.JTextArea tConcepto;
     private javax.swing.JTextField tCuenta;
@@ -629,11 +772,15 @@ public class RegistroPartida extends javax.swing.JInternalFrame {
             tiva.setSelectedIndex(0);
             civa.setSelectedIndex(0);
             if (i == 2 || i == 4) {
-                tnpartida.setText("");
                 tConcepto.setText("");
+                tdebe.setText("DEBE");
+                thaber.setText("HABER");
+                modelo();
                 if (i == 4) {
+                    tnpartida.setText("");
                     tfecha.setDate(null);
                 }
+                cr = 0;
             }
         }
     }
@@ -643,7 +790,7 @@ public class RegistroPartida extends javax.swing.JInternalFrame {
         if (pda == null) {
             tnpartida.setText("1");
         } else {
-            tnpartida.setText("" + pda.getNumpartida() + 1);
+            tnpartida.setText("" + (pda.getNumpartida() + 1));
         }
     }
 
@@ -660,6 +807,132 @@ public class RegistroPartida extends javax.swing.JInternalFrame {
     }
 
     private boolean validarB() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if (thaber.getText().equals(tdebe.getText()) && !tConcepto.getText().equals("")) {
+            return true;
+        } else if (!thaber.getText().equals(tdebe.getText())) {
+            JOptionPane.showMessageDialog(rootPane, "EL DEBE Y EL HABER NO CUADRAN", "NO CUADRA", JOptionPane.WARNING_MESSAGE);
+            return false;
+        } else {
+            JOptionPane.showMessageDialog(rootPane, "INGRESE EL CONCEPTO DE LA PARTIDA", "INGRESE DATO", JOptionPane.WARNING_MESSAGE);
+            return false;
+        }
+    }
+
+    //PARA MENU POPUP DE CODIGO DE CUENTAS
+    private void bus(String c) {
+        if (c.length() > 1) {
+            Conexion conexion = new Conexion();
+            Statement st = null;
+            ResultSet rs = null;
+            try {
+                st = conexion.abrirConexion().createStatement();
+                rs = st.executeQuery("SELECT codigo, nombre "
+                        + "FROM cuenta WHERE codigo LIKE '" + c + "%'");
+                while (rs.next()) {
+                    elmt = rs.getString("codigo") + " | " + conexion.resultado.getString("nombre");
+                    JMenuItem p = new JMenuItem(elmt);
+                    p.setEnabled(false);
+                    pmenu.add(p);
+                }
+                conexion.cerrarConexion();
+            } catch (Exception e) {
+                System.out.println("ERROR" + e.getMessage());
+            }
+        }
+    }
+
+    //RELLENAR EL NOMBRE DE CUENTA SI EL CODIGO ES VALIDO
+    private String cexiste(String c) {
+        Conexion conexion = new Conexion();
+        Statement st = null;
+        ResultSet rs = null;
+        String b = "";
+        try {
+            st = conexion.abrirConexion().createStatement();
+            rs = st.executeQuery("SELECT nombre FROM cuenta WHERE codigo = " + c);
+            rs.beforeFirst();
+            while (rs.next()) {
+                b = rs.getString("nombre");
+            }
+            conexion.cerrarConexion();
+        } catch (Exception e) {
+            System.out.println("ERROR" + e.getMessage());
+        }
+        return b;
+    }
+
+    private void agrtab(Transaccion tra, int bnx) {
+        modelo.setRowCount(cr + 1);
+        modelo.setValueAt(tra.getIdcuenta(), cr, 0);
+        modelo.setValueAt(cexiste(String.valueOf(tra.getIdcuenta())), cr, 1);
+        for (int i = 0; i <= 3; i++) {
+            if (i == tra.getOperacion()) {
+                modelo.setValueAt(df.format(tra.getMonto()), cr, i + 1);
+                if (bnx == 1) {
+                    double val = Double.parseDouble((String) modelo.getValueAt(cr - 1, i + 1)) - tra.getMonto();
+                    modelo.setValueAt(df.format(val), cr - 1, i + 1);
+                    tran.get(cr - 1).setMonto(val);
+                }
+            } else {
+                if (i != 0) {
+                    modelo.setValueAt(0.00, cr, i + 1);
+                }
+            }
+        }
+        int idc = new ControladorCuenta().obtenerId(tra.getIdcuenta());
+        System.out.println("id "+idc);
+        tra.setIdcuenta(idc);
+        tran.add(tra);
+        cr++;
+        totales();
+    }
+
+    private void agriva() {
+        int tipo = tiva.getSelectedIndex();
+        if (tipo > 0) {
+            int cod = 0;
+            String cta = "";
+            double monto = Double.parseDouble(tMonto.getText());
+            int calc = civa.getSelectedIndex();
+            double ivan = monto * 0.13;
+            monto = monto / 1.13;
+            double ivai = monto * 0.13;
+            switch (tipo) {
+                case 1://CREDITO
+                    cod = 1107;
+                    cta = "IVA CREDITO FISCAL";
+                    if (calc == 1) {//INCLUIDO
+                        trn = new Transaccion(pda.getNumpartida(), cod, ivai, tColumna.getSelectedIndex());
+                        cod = 1;
+                    } else if (calc == 2) {//NO INCLUIDO
+                        trn = new Transaccion(pda.getNumpartida(), cod, ivan, tColumna.getSelectedIndex());
+                        cod = 0;
+                    }
+                    break;
+                case 2://DEBITO
+                    cod = 2105;
+                    cta = "IVA DEDITO FISCAL";
+                    if (calc == 1) {//INCLUIDO
+                        trn = new Transaccion(pda.getNumpartida(), cod, ivai, tColumna.getSelectedIndex());
+                        cod = 1;
+                    } else if (calc == 2) {//NO INCLUIDO
+                        trn = new Transaccion(pda.getNumpartida(), cod, ivan, tColumna.getSelectedIndex());
+                        cod = 0;
+                    }
+                    break;
+            }
+            agrtab(trn, cod);
+        }
+    }
+
+    private void totales() {
+        double debe = 0;
+        double haber = 0;
+        for (int i = 0; i < cr; i++) {
+            debe += Double.parseDouble(modelo.getValueAt(i, 3).toString());
+            haber += Double.parseDouble(modelo.getValueAt(i, 4).toString());
+        }
+        tdebe.setText(df.format(debe));
+        thaber.setText(df.format(haber));
     }
 }

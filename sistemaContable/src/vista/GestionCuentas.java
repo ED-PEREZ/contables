@@ -274,7 +274,6 @@ public class GestionCuentas extends javax.swing.JInternalFrame {
         Dimension tamaño = vista.getSize();
         vista.setLocation((escritorioSize.width - tamaño.width) / 2, (escritorioSize.height - tamaño.height) / 2);
         vista.show();
-
         modelo();
         verTabla();
     }//GEN-LAST:event_botonModificarActionPerformed

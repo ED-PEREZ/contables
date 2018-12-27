@@ -5,7 +5,7 @@
  */
 package modelo;
 
-import java.util.Date;
+import java.sql.Timestamp;
 
 /**
  *
@@ -14,10 +14,10 @@ import java.util.Date;
 public class Partida {
     private int idpartida;
     private int numpartida;
-    private Date fecha;
+    private Timestamp fecha;
     private String concepto;
 
-    public Partida(int numpartida, Date fecha, String concepto) {
+    public Partida(int numpartida, Timestamp fecha, String concepto) {
         this.idpartida = 0;
         this.numpartida = numpartida;
         this.fecha = fecha;
@@ -43,11 +43,11 @@ public class Partida {
         this.numpartida = numpartida;
     }
 
-    public Date getFecha() {
+    public Timestamp getFecha() {
         return fecha;
     }
 
-    public void setFecha(Date fecha) {
+    public void setFecha(Timestamp fecha) {
         this.fecha = fecha;
     }
 

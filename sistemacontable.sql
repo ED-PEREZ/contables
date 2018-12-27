@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 4.7.9
+-- version 4.8.3
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 15-11-2018 a las 05:19:56
--- Versión del servidor: 10.1.31-MariaDB
--- Versión de PHP: 7.2.3
+-- Tiempo de generación: 27-12-2018 a las 03:03:41
+-- Versión del servidor: 10.1.26-MariaDB
+-- Versión de PHP: 7.1.8
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET AUTOCOMMIT = 0;
@@ -47,13 +47,15 @@ CREATE TABLE `cuenta` (
 
 INSERT INTO `cuenta` (`idcuenta`, `codigo`, `nombre`, `tiposaldo`, `saldo`, `idorden`, `descripcion`, `nivel`, `tipocuenta`, `movimiento`) VALUES
 (1, '1', 'activo', 'Deudor', NULL, NULL, NULL, 1, 'ACTIVO', NULL),
-(2, '12', 'Corriente', 'Deudor', NULL, 1, NULL, 2, NULL, NULL),
+(2, '11', 'Corriente', 'Deudor', NULL, 1, NULL, 2, NULL, NULL),
 (3, '12', 'No Corriente', 'Deudor', NULL, 1, NULL, 2, NULL, NULL),
 (5, '2', 'Pasivo', 'Acreedor', NULL, NULL, NULL, 1, NULL, NULL),
 (6, '3', 'Patrimonio', 'Acreedor', NULL, NULL, NULL, 1, NULL, NULL),
 (7, '21', 'Corriente', 'Acreedor', NULL, 2, NULL, 2, NULL, NULL),
 (9, '22', 'Pasivo no corriente', 'Acreedor', NULL, 5, NULL, 2, NULL, NULL),
-(10, '1204', 'prueva', 'Deudor', NULL, 3, NULL, 3, 'ACTIVO', '1204');
+(10, '1204', 'prueva', 'Deudor', NULL, 3, NULL, 3, 'ACTIVO', '1204'),
+(11, '1107', 'IVA CREDITO FISCAL', 'Deudor', NULL, 2, NULL, 3, 'ACTIVO', 'no'),
+(12, '2105', 'IVA DEBITO FISCAL', 'Acreedor', NULL, 7, NULL, 3, 'PASIVO', 'no');
 
 -- --------------------------------------------------------
 
@@ -64,8 +66,8 @@ INSERT INTO `cuenta` (`idcuenta`, `codigo`, `nombre`, `tiposaldo`, `saldo`, `ido
 CREATE TABLE `partida` (
   `idpartida` int(11) NOT NULL,
   `numpartida` int(11) NOT NULL,
-  `fecha` date NOT NULL,
-  `concepto` varchar(40) NOT NULL
+  `fecha` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `concepto` varchar(100) CHARACTER SET utf8 COLLATE utf8_spanish_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -115,7 +117,7 @@ ALTER TABLE `transaccion`
 -- AUTO_INCREMENT de la tabla `cuenta`
 --
 ALTER TABLE `cuenta`
-  MODIFY `idcuenta` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `idcuenta` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT de la tabla `partida`
