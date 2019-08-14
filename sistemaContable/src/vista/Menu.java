@@ -5,10 +5,14 @@
  */
 package vista;
 
+import controlador.ControladorEstado;
+import controlador.ControladorPartida;
+import informe.MostrarReportes;
 import java.awt.Dimension;
 import static java.awt.image.ImageObserver.WIDTH;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import modelo.Partida;
 
 /**
  *
@@ -23,6 +27,7 @@ public class Menu extends javax.swing.JFrame {
         initComponents();
 
         setExtendedState(JFrame.MAXIMIZED_BOTH);
+        comprobar();
 
     }
 
@@ -43,6 +48,7 @@ public class Menu extends javax.swing.JFrame {
         mCuenta = new javax.swing.JMenu();
         mCGestion = new javax.swing.JMenuItem();
         mCIngresar = new javax.swing.JMenuItem();
+        jMenuItem1 = new javax.swing.JMenuItem();
         mPartida = new javax.swing.JMenu();
         mPIngresar = new javax.swing.JMenuItem();
         mReportes = new javax.swing.JMenu();
@@ -105,6 +111,15 @@ public class Menu extends javax.swing.JFrame {
         });
         mCuenta.add(mCIngresar);
 
+        jMenuItem1.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        jMenuItem1.setText("CATALOGO");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
+        mCuenta.add(jMenuItem1);
+
         jMenuBar1.add(mCuenta);
 
         mPartida.setText("PARTIDAS");
@@ -127,22 +142,47 @@ public class Menu extends javax.swing.JFrame {
 
         mRDiario.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         mRDiario.setText("LIBRO DIARIO");
+        mRDiario.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mRDiarioActionPerformed(evt);
+            }
+        });
         mReportes.add(mRDiario);
 
         mRMayor.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         mRMayor.setText("LIBRO MAYOR");
+        mRMayor.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mRMayorActionPerformed(evt);
+            }
+        });
         mReportes.add(mRMayor);
 
         mRBalanza.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         mRBalanza.setText("BALANZA DE COMPROBACION");
+        mRBalanza.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mRBalanzaActionPerformed(evt);
+            }
+        });
         mReportes.add(mRBalanza);
 
         mREstado.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         mREstado.setText("ESTADO DE RESULTADO");
+        mREstado.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mREstadoActionPerformed(evt);
+            }
+        });
         mReportes.add(mREstado);
 
         mRBalance.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         mRBalance.setText("BALANCE GENERAL");
+        mRBalance.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mRBalanceActionPerformed(evt);
+            }
+        });
         mReportes.add(mRBalance);
 
         jMenuBar1.add(mReportes);
@@ -161,6 +201,11 @@ public class Menu extends javax.swing.JFrame {
 
         mECierre.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         mECierre.setText("CIERRE");
+        mECierre.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mECierreActionPerformed(evt);
+            }
+        });
         mEjercicio.add(mECierre);
 
         jMenuBar1.add(mEjercicio);
@@ -229,13 +274,82 @@ public class Menu extends javax.swing.JFrame {
 
     private void mEAperturaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mEAperturaActionPerformed
         // TODO add your handling code here:
+        try {
+            if (JOptionPane.showConfirmDialog(null, "Se eliminaran todas las transaciones como sus partidas!\n¿quiere continuar?") == 0) {
+                new controlador.ControladorTransaccion().delete();
+                new controlador.ControladorPartida().delete();
+                new controlador.ControladorEstado().eliminar();
+                JOptionPane.showMessageDialog(null, "Apertura completada!");
+                mECierre.setEnabled(true);
+                mEApertura.setEnabled(false);
+                mPartida.setEnabled(true);
+                mCGestion.setEnabled(true);
+                mCIngresar.setEnabled(true);
+            }
+        } catch (Exception e) {
+        }
     }//GEN-LAST:event_mEAperturaActionPerformed
 
     private void jMenuItem13ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem13ActionPerformed
         int i = JOptionPane.showConfirmDialog(null, "¿CERRAR PROGRAMA?", "CONFIRME", WIDTH);
-        if(i==0){
-        dispose();}
+        if (i == 0) {
+            dispose();
+        }
     }//GEN-LAST:event_jMenuItem13ActionPerformed
+
+    private void mRBalanzaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mRBalanzaActionPerformed
+        // TODO add your handling code here:
+        // ControladorMayor mayor= new ControladorMayor();
+        //mayor.generarMayores();
+        new MostrarReportes().BalanzaDeComprobacion();
+    }//GEN-LAST:event_mRBalanzaActionPerformed
+
+    private void mRBalanceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mRBalanceActionPerformed
+        // TODO add your handling code here:
+        new MostrarReportes().BalanceGeneral();
+    }//GEN-LAST:event_mRBalanceActionPerformed
+
+    private void mRDiarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mRDiarioActionPerformed
+        // TODO add your handling code here:
+        new MostrarReportes().LibroDiario();
+    }//GEN-LAST:event_mRDiarioActionPerformed
+
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        // TODO add your handling code here:
+        new MostrarReportes().Catalogo();
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
+
+    private void mREstadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mREstadoActionPerformed
+        // TODO add your handling code here:
+//       ControladorEstado estado= new ControladorEstado();
+//       estado.generarEstado();
+        new ControladorEstado().generarEstado();
+        new MostrarReportes().Estado();
+    }//GEN-LAST:event_mREstadoActionPerformed
+
+    private void mECierreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mECierreActionPerformed
+        // TODO add your handling code here:
+        JOptionPane.showMessageDialog(null, "¡Se generaran las partidas de ajustes como la de cierre!", "Infromacion", JOptionPane.INFORMATION_MESSAGE);
+        try {
+            if (JOptionPane.showConfirmDialog(null, "¿Esta seguro de continuar?") == 0) {
+                new ControladorEstado().partidaCierre();
+                JOptionPane.showMessageDialog(null, "Cierre completado!", "Infromacion", JOptionPane.INFORMATION_MESSAGE);
+                mECierre.setEnabled(false);
+                mEApertura.setEnabled(true);
+                mPartida.setEnabled(false);
+                mCGestion.setEnabled(false);
+                mCIngresar.setEnabled(false);
+            } else {
+            }
+        } catch (Exception e) {
+        }
+    }//GEN-LAST:event_mECierreActionPerformed
+
+    private void mRMayorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mRMayorActionPerformed
+
+        // TODO add your handling code here:
+        new MostrarReportes().LibroMayor();
+    }//GEN-LAST:event_mRMayorActionPerformed
 
     /**
      * @param args the command line arguments
@@ -277,6 +391,7 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JMenu jMenu3;
     private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem11;
     private javax.swing.JMenuItem jMenuItem12;
     private javax.swing.JMenuItem jMenuItem13;
@@ -295,4 +410,34 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JMenuItem mRMayor;
     private javax.swing.JMenu mReportes;
     // End of variables declaration//GEN-END:variables
+
+    public void comprobar() {
+        ControladorPartida cp= new ControladorPartida();
+        Partida num = cp.numeroPartida();
+        if (num.getNumpartida()>0) {
+            int fi = 0;
+            num.setConcepto(new controlador.ControladorPartida().concepto(num.getNumpartida()).getConcepto());
+            if (num.getConcepto().equals("V/por cierre del ejercicio")) {
+                mECierre.setEnabled(false);
+                mEApertura.setEnabled(true);
+                mPartida.setEnabled(false);
+                mCGestion.setEnabled(false);
+                mCIngresar.setEnabled(false);
+            } else {
+                mECierre.setEnabled(true);
+                mEApertura.setEnabled(false);
+                mPartida.setEnabled(true);
+                mCGestion.setEnabled(true);
+                mCIngresar.setEnabled(true);
+
+            }
+        } else {
+            mECierre.setEnabled(true);
+                mEApertura.setEnabled(false);
+                mPartida.setEnabled(true);
+                mCGestion.setEnabled(true);
+                mCIngresar.setEnabled(true);
+
+        }
+    }
 }

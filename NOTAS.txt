@@ -1,5 +1,16 @@
 VERSION 1.0
 ALMACENAMIENTO Y GESTION DEL CATALOGO DE CUENTAS
 VERSION 1.1
-CREACION DE PARTIDAS
 MEJORA EN INTERFAZ
+VERSION 1.2
+CREACION DE PARTIDAS
+VERSION 1.3
+SOLO DEBE Y HABER
+Version 1.4
+Informes de catalog,libro diario,Balanza de comprobacion y Balance general (Mensaje de solo cuentas de nivel 3 pueden ser utilizadas en tracsaciones)
+Version 1.5 
+Tabla estado en la base y reporte de estado de resultado
+Verion 1.6
+Generas las partidas de ajustes como el cierre del ejercicio
+Version 1.7.3
+Arreglos en el informe del libro mayor y cuentas de ingresos ahora si tienen bien el tipo de saldo

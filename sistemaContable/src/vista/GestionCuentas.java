@@ -267,7 +267,7 @@ public class GestionCuentas extends javax.swing.JInternalFrame {
     private void botonModificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonModificarActionPerformed
         // TODO add your handling code here:
         Cuenta cuenta = controlador.buscarCuenta(codigo);
-        ModificarCuenta vista = new ModificarCuenta(escritorio, cuenta);
+        ModificaCuenta vista = new ModificaCuenta(escritorio, cuenta);
         vista.setClosable(true);
         escritorio.add(vista);
         Dimension escritorioSize = escritorio.getSize();

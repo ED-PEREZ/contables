@@ -7,7 +7,7 @@ package modelo;
 
 /**
  *
- * @author jose
+ * @author jose 
  */
 public class Cuenta {
     private Integer id;

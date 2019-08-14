@@ -44,7 +44,52 @@ public class ControladorPartida {
         JOptionPane.showMessageDialog(null, "CREACION DE LA PARTIDA " + estado, estado, ico);
         return false;
     }
-
+    
+    public Partida concepto(int i){
+        Partida p=new Partida();
+        try {
+            conexion.abrirConexion();
+            Statement st = conexion.abrirConexion().createStatement();
+            ResultSet rs = st.executeQuery("SELECT *\n" +
+"FROM partida\n" +
+"WHERE\n" +
+"partida.numpartida = "+i+"");
+            while (rs.next()) {
+                p = new Partida();
+                p.setNumpartida(rs.getInt(2));
+                p.setConcepto(rs.getString(4));
+            }
+            conexion.cerrarConexion();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return p;        
+    }
+    
+    public Partida buscarConcepto(String i){
+        Partida p=null;
+        try {
+            conexion.abrirConexion();
+            Statement st = conexion.abrirConexion().createStatement();
+            ResultSet rs = st.executeQuery("SELECT *\n" +
+"FROM partida\n" +
+"WHERE\n" +
+"partida.concepto = '"+i+"'");
+            while (rs.next()) {
+                p = new Partida();
+                p.setNumpartida(rs.getInt(2));
+                p.setIdpartida(rs.getInt(1));
+                p.setConcepto(rs.getString(4));
+                
+            }
+            conexion.cerrarConexion();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return p;        
+    }
+    
+    
     public Partida numeroPartida() {
         Partida p = null;
         try {
@@ -80,5 +125,17 @@ public class ControladorPartida {
             System.out.println(e);
         }
         return id;
+    }
+    
+    public void delete() {
+        try {
+            conexion.abrirConexion();
+            Statement st = conexion.abrirConexion().createStatement();
+            String sql = "DELETE FROM partida ";
+            st.executeUpdate(sql);
+            conexion.cerrarConexion();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
     }
 }

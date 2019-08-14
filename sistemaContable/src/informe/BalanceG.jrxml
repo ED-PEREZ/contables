@@ -1,0 +1,962 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="null" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="2308bb00-a769-4c2c-8678-d7bd011a42fd">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="Title" forecolor="#FFFFFF" fontName="Arial" fontSize="26" isBold="true" pdfFontName="Helvetica-Bold"/>
+	<style name="SubTitle" forecolor="#666666" fontName="Arial" fontSize="18"/>
+	<style name="Column header" forecolor="#666666" fontName="Arial" fontSize="12" isBold="true"/>
+	<style name="Detail" fontName="Arial" fontSize="12"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1">
+		<box>
+			<pen lineWidth="1.0" lineColor="#FFFFFF"/>
+		</box>
+	</style>
+	<style name="table 1_TH" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#FFFFFF"/>
+		</box>
+	</style>
+	<style name="table 1_CH" mode="Opaque" backcolor="#FFBFBF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#FFFFFF"/>
+		</box>
+	</style>
+	<style name="table 1_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#FFFFFF"/>
+		</box>
+	</style>
+	<subDataset name="Activos Corriente" uuid="fd9a891f-e6d3-40e9-bab2-15c380c27a09">
+		<parameter name="AC" class="java.lang.Integer"/>
+		<queryString>
+			<![CDATA[SELECT
+cuenta.idcuenta,
+cuenta.codigo,
+cuenta.nombre,
+(SELECT
+Sum(transaccion.monto) AS debe
+FROM
+transaccion
+INNER JOIN partida ON transaccion.idpartida = partida.idpartida
+WHERE
+transaccion.operacion = 1 AND partida.numpartida!=$P{AC} AND
+transaccion.idcuenta = cuenta.idcuenta
+) AS Debe,
+(SELECT
+Sum(transaccion.monto) AS debe
+FROM
+transaccion
+INNER JOIN partida ON transaccion.idpartida = partida.idpartida
+WHERE
+transaccion.operacion = 2 AND partida.numpartida!=$P{AC} AND
+transaccion.idcuenta = cuenta.idcuenta 
+) AS Haber,
+cuenta.tipocuenta
+FROM
+cuenta
+INNER JOIN transaccion ON transaccion.idcuenta = cuenta.idcuenta
+WHERE
+cuenta.nivel = 3 AND
+cuenta.codigo LIKE '11%'
+GROUP BY
+cuenta.idcuenta
+ORDER BY
+cuenta.codigo ASC]]>
+		</queryString>
+		<field name="idcuenta" class="java.lang.Integer">
+			<fieldDescription><![CDATA[]]></fieldDescription>
+		</field>
+		<field name="codigo" class="java.lang.String">
+			<fieldDescription><![CDATA[]]></fieldDescription>
+		</field>
+		<field name="nombre" class="java.lang.String">
+			<fieldDescription><![CDATA[]]></fieldDescription>
+		</field>
+		<field name="Debe" class="java.lang.Double"/>
+		<field name="Haber" class="java.lang.Double"/>
+		<field name="tipocuenta" class="java.lang.String">
+			<fieldDescription><![CDATA[]]></fieldDescription>
+		</field>
+		<variable name="sumCorriente" class="java.lang.Double" calculation="Sum">
+			<variableExpression><![CDATA[$V{monto}]]></variableExpression>
+			<initialValueExpression><![CDATA[0.0]]></initialValueExpression>
+		</variable>
+		<variable name="monto" class="java.lang.Double" resetType="None">
+			<variableExpression><![CDATA[$F{Haber}==null ? ($F{codigo}.indexOf( "R" )!=-1? -$F{Debe}:$F{Debe}):$F{codigo}.indexOf( "R" )!=-1? -($F{Debe}-$F{Haber}):($F{Debe}-$F{Haber})]]></variableExpression>
+			<initialValueExpression><![CDATA[0]]></initialValueExpression>
+		</variable>
+	</subDataset>
+	<subDataset name="Activo No corriente" uuid="8d95d56e-2dbb-40ba-b578-aa4ce97bd88c">
+		<parameter name="AN" class="java.lang.Integer"/>
+		<queryString>
+			<![CDATA[SELECT
+cuenta.idcuenta,
+cuenta.codigo,
+cuenta.nombre,
+(SELECT
+Sum(transaccion.monto) AS debe
+FROM
+transaccion
+INNER JOIN partida ON transaccion.idpartida = partida.idpartida
+WHERE
+transaccion.operacion = 1 AND partida.numpartida!=$P{AN} AND
+transaccion.idcuenta = cuenta.idcuenta
+) AS Debe,
+(SELECT
+Sum(transaccion.monto) AS debe
+FROM
+transaccion
+INNER JOIN partida ON transaccion.idpartida = partida.idpartida
+WHERE
+transaccion.operacion = 2 AND partida.numpartida!=$P{AN} AND
+transaccion.idcuenta = cuenta.idcuenta 
+) AS Haber,
+cuenta.tipocuenta
+FROM
+cuenta
+INNER JOIN transaccion ON transaccion.idcuenta = cuenta.idcuenta
+WHERE
+cuenta.nivel = 3 AND
+cuenta.codigo LIKE '12%'
+GROUP BY
+cuenta.idcuenta
+ORDER BY
+cuenta.codigo ASC]]>
+		</queryString>
+		<field name="idcuenta" class="java.lang.Integer">
+			<fieldDescription><![CDATA[]]></fieldDescription>
+		</field>
+		<field name="codigo" class="java.lang.String">
+			<fieldDescription><![CDATA[]]></fieldDescription>
+		</field>
+		<field name="nombre" class="java.lang.String">
+			<fieldDescription><![CDATA[]]></fieldDescription>
+		</field>
+		<field name="Debe" class="java.lang.Double"/>
+		<field name="Haber" class="java.lang.Double"/>
+		<field name="tipocuenta" class="java.lang.String">
+			<fieldDescription><![CDATA[]]></fieldDescription>
+		</field>
+		<variable name="sumNoC" class="java.lang.Double" calculation="Sum">
+			<variableExpression><![CDATA[$V{monto}]]></variableExpression>
+			<initialValueExpression><![CDATA[0.0]]></initialValueExpression>
+		</variable>
+		<variable name="monto" class="java.lang.Double" resetType="None">
+			<variableExpression><![CDATA[$F{Haber}==null ? ($F{codigo}.indexOf( "R" )!=-1? -$F{Debe}:$F{Debe}):$F{codigo}.indexOf( "R" )!=-1? -($F{Debe}-$F{Haber}):($F{Debe}-$F{Haber})]]></variableExpression>
+			<initialValueExpression><![CDATA[0]]></initialValueExpression>
+		</variable>
+	</subDataset>
+	<subDataset name="Pasivo Corriente" uuid="2be18c18-6f4e-4217-9e90-149b760e036e">
+		<parameter name="PC" class="java.lang.Integer"/>
+		<queryString>
+			<![CDATA[SELECT
+cuenta.idcuenta,
+cuenta.codigo,
+cuenta.nombre,
+(SELECT
+Sum(transaccion.monto) AS debe
+FROM
+transaccion
+INNER JOIN partida ON transaccion.idpartida = partida.idpartida
+WHERE
+transaccion.operacion = 1 AND partida.numpartida!=$P{PC} AND
+transaccion.idcuenta = cuenta.idcuenta
+) AS Debe,
+(SELECT
+Sum(transaccion.monto) AS debe
+FROM
+transaccion
+INNER JOIN partida ON transaccion.idpartida = partida.idpartida
+WHERE
+transaccion.operacion = 2 AND partida.numpartida!=$P{PC} AND
+transaccion.idcuenta = cuenta.idcuenta 
+) AS Haber,
+cuenta.tipocuenta
+FROM
+cuenta
+INNER JOIN transaccion ON transaccion.idcuenta = cuenta.idcuenta
+WHERE
+cuenta.nivel = 3 AND
+cuenta.codigo LIKE '21%'
+GROUP BY
+cuenta.idcuenta
+ORDER BY
+cuenta.codigo ASC]]>
+		</queryString>
+		<field name="idcuenta" class="java.lang.Integer">
+			<fieldDescription><![CDATA[]]></fieldDescription>
+		</field>
+		<field name="codigo" class="java.lang.String">
+			<fieldDescription><![CDATA[]]></fieldDescription>
+		</field>
+		<field name="nombre" class="java.lang.String">
+			<fieldDescription><![CDATA[]]></fieldDescription>
+		</field>
+		<field name="Debe" class="java.lang.Double"/>
+		<field name="Haber" class="java.lang.Double"/>
+		<field name="tipocuenta" class="java.lang.String">
+			<fieldDescription><![CDATA[]]></fieldDescription>
+		</field>
+		<variable name="sumPasC" class="java.lang.Double" calculation="Sum">
+			<variableExpression><![CDATA[$V{monto}]]></variableExpression>
+			<initialValueExpression><![CDATA[0.0]]></initialValueExpression>
+		</variable>
+		<variable name="monto" class="java.lang.Double" resetType="None">
+			<variableExpression><![CDATA[$F{Debe}==null ? ($F{codigo}.indexOf( "R" )!=-1? -$F{Haber}:$F{Haber}):$F{codigo}.indexOf( "R" )!=-1? -($F{Haber}-$F{Debe}):($F{Haber}-$F{Debe})]]></variableExpression>
+			<initialValueExpression><![CDATA[0]]></initialValueExpression>
+		</variable>
+	</subDataset>
+	<subDataset name="Pasivo No Corriente" uuid="f82f07c5-c744-4c1a-9dac-e4c693ad667e">
+		<parameter name="PN" class="java.lang.Integer"/>
+		<queryString>
+			<![CDATA[SELECT
+cuenta.idcuenta,
+cuenta.codigo,
+cuenta.nombre,
+(SELECT
+Sum(transaccion.monto) AS debe
+FROM
+transaccion
+INNER JOIN partida ON transaccion.idpartida = partida.idpartida
+WHERE
+transaccion.operacion = 1 AND partida.numpartida!=$P{PN} AND
+transaccion.idcuenta = cuenta.idcuenta
+) AS Debe,
+(SELECT
+Sum(transaccion.monto) AS debe
+FROM
+transaccion
+INNER JOIN partida ON transaccion.idpartida = partida.idpartida
+WHERE
+transaccion.operacion = 2 AND partida.numpartida!=$P{PN} AND
+transaccion.idcuenta = cuenta.idcuenta 
+) AS Haber,
+cuenta.tipocuenta
+FROM
+cuenta
+INNER JOIN transaccion ON transaccion.idcuenta = cuenta.idcuenta
+WHERE
+cuenta.nivel = 3 AND
+cuenta.codigo LIKE '22%'
+GROUP BY
+cuenta.idcuenta
+ORDER BY
+cuenta.codigo ASC]]>
+		</queryString>
+		<field name="idcuenta" class="java.lang.Integer">
+			<fieldDescription><![CDATA[]]></fieldDescription>
+		</field>
+		<field name="codigo" class="java.lang.String">
+			<fieldDescription><![CDATA[]]></fieldDescription>
+		</field>
+		<field name="nombre" class="java.lang.String">
+			<fieldDescription><![CDATA[]]></fieldDescription>
+		</field>
+		<field name="Debe" class="java.lang.Double"/>
+		<field name="Haber" class="java.lang.Double"/>
+		<field name="tipocuenta" class="java.lang.String">
+			<fieldDescription><![CDATA[]]></fieldDescription>
+		</field>
+		<variable name="monto" class="java.lang.Double" resetType="None">
+			<variableExpression><![CDATA[$F{Debe}==null ? ($F{codigo}.indexOf( "R" )!=-1? -$F{Haber}:$F{Haber}):$F{codigo}.indexOf( "R" )!=-1? -($F{Haber}-$F{Debe}):($F{Haber}-$F{Debe})]]></variableExpression>
+			<initialValueExpression><![CDATA[0]]></initialValueExpression>
+		</variable>
+		<variable name="sumNoCor" class="java.lang.Double" calculation="Sum">
+			<variableExpression><![CDATA[$V{monto}]]></variableExpression>
+			<initialValueExpression><![CDATA[0.0]]></initialValueExpression>
+		</variable>
+	</subDataset>
+	<subDataset name="Patrimonio" uuid="6476fa99-a56f-4345-ae35-7019fffd8756">
+		<parameter name="PA" class="java.lang.Integer"/>
+		<queryString>
+			<![CDATA[SELECT
+cuenta.idcuenta,
+cuenta.codigo,
+cuenta.nombre,
+(SELECT
+Sum(transaccion.monto) AS debe
+FROM
+transaccion
+INNER JOIN partida ON transaccion.idpartida = partida.idpartida
+WHERE
+transaccion.operacion = 1 AND partida.numpartida!=$P{PA} AND
+transaccion.idcuenta = cuenta.idcuenta
+) AS Debe,
+(SELECT
+Sum(transaccion.monto) AS debe
+FROM
+transaccion
+INNER JOIN partida ON transaccion.idpartida = partida.idpartida
+WHERE
+transaccion.operacion = 2 AND partida.numpartida!=$P{PA} AND
+transaccion.idcuenta = cuenta.idcuenta 
+) AS Haber,
+cuenta.tipocuenta
+FROM
+cuenta
+INNER JOIN transaccion ON transaccion.idcuenta = cuenta.idcuenta
+WHERE
+cuenta.nivel = 3 AND
+cuenta.tipocuenta='PATRIMONIO'
+GROUP BY
+cuenta.idcuenta
+ORDER BY
+cuenta.codigo ASC]]>
+		</queryString>
+		<field name="idcuenta" class="java.lang.Integer">
+			<fieldDescription><![CDATA[]]></fieldDescription>
+		</field>
+		<field name="codigo" class="java.lang.String">
+			<fieldDescription><![CDATA[]]></fieldDescription>
+		</field>
+		<field name="nombre" class="java.lang.String">
+			<fieldDescription><![CDATA[]]></fieldDescription>
+		</field>
+		<field name="Debe" class="java.lang.Double"/>
+		<field name="Haber" class="java.lang.Double"/>
+		<field name="tipocuenta" class="java.lang.String">
+			<fieldDescription><![CDATA[]]></fieldDescription>
+		</field>
+		<variable name="monto" class="java.lang.Double" resetType="None">
+			<variableExpression><![CDATA[$F{Debe}==null ? ($F{codigo}.indexOf( "R" )!=-1? -$F{Haber}:$F{Haber}):$F{codigo}.indexOf( "R" )!=-1? -($F{Haber}-$F{Debe}):($F{Haber}-$F{Debe})]]></variableExpression>
+			<initialValueExpression><![CDATA[0]]></initialValueExpression>
+		</variable>
+		<variable name="sumPatr" class="java.lang.Double" calculation="Sum">
+			<variableExpression><![CDATA[$V{monto}]]></variableExpression>
+			<initialValueExpression><![CDATA[0.0]]></initialValueExpression>
+		</variable>
+	</subDataset>
+	<parameter name="ultimP" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[SELECT
+cuenta.idcuenta,
+cuenta.codigo,
+cuenta.nombre,
+(SELECT
+Sum(transaccion.monto) AS debe
+FROM
+transaccion
+INNER JOIN partida ON transaccion.idpartida = partida.idpartida
+WHERE
+transaccion.operacion = 1 AND partida.numpartida!= $P{ultimP} AND
+transaccion.idcuenta = cuenta.idcuenta
+) AS Debe,
+(SELECT
+Sum(transaccion.monto) AS debe
+FROM
+transaccion
+INNER JOIN partida ON transaccion.idpartida = partida.idpartida
+WHERE
+transaccion.operacion = 2 AND partida.numpartida!= $P{ultimP} AND
+transaccion.idcuenta = cuenta.idcuenta 
+) AS Haber,
+cuenta.tipocuenta
+FROM
+cuenta
+INNER JOIN transaccion ON transaccion.idcuenta = cuenta.idcuenta
+INNER JOIN partida ON transaccion.idpartida = partida.idpartida
+WHERE
+cuenta.nivel = 3 AND (cuenta.tipocuenta='ACTIVO' or cuenta.tipocuenta='PASIVO' or cuenta.tipocuenta='PATRIMONIO') 
+GROUP BY
+cuenta.idcuenta
+ORDER BY
+cuenta.codigo ASC]]>
+	</queryString>
+	<field name="idcuenta" class="java.lang.Integer">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="codigo" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="nombre" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Debe" class="java.lang.Double"/>
+	<field name="Haber" class="java.lang.Double"/>
+	<field name="tipocuenta" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<variable name="sumActivo" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{tipocuenta}.compareTo( "ACTIVO" )!=0?0:$F{Haber}==null ? ($F{codigo}.indexOf( "R" )!=-1? -$F{Debe}:$F{Debe}):$F{codigo}.indexOf( "R" )!=-1? -($F{Debe}-$F{Haber}):($F{Debe}-$F{Haber})]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="montoA" class="java.lang.Double">
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="sumaPasivoPatr" class="java.lang.Double" calculation="Sum">
+		<variableExpression><![CDATA[$F{tipocuenta}.compareTo( "ACTIVO" )!=0?($F{Debe}==null ? ($F{codigo}.indexOf( "R" )!=-1? -$F{Haber}:$F{Haber}):$F{codigo}.indexOf( "R" )!=-1? -($F{Haber}-$F{Debe}):($F{Haber}-$F{Debe})):0]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="110">
+			<staticText>
+				<reportElement style="SubTitle" x="173" y="72" width="220" height="22" uuid="5a8dc9eb-4d18-455b-8fad-4fd11dcfbcea"/>
+				<textElement>
+					<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+				</textElement>
+				<text><![CDATA[01 Enero al 31 Diciembre ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Title" x="156" y="0" width="345" height="36" forecolor="#333333" uuid="b02f930a-0946-4efd-956c-51e22deaedad"/>
+				<textElement verticalAlignment="Middle">
+					<font size="26" pdfFontName="Times-Roman"/>
+				</textElement>
+				<text><![CDATA[NOMBRE S.A. C.V]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Title" x="156" y="36" width="320" height="36" forecolor="#333333" uuid="13cc6672-87b3-499d-9c9d-dc49133da2a3"/>
+				<textElement verticalAlignment="Middle">
+					<font size="26" pdfFontName="Times-Roman"/>
+				</textElement>
+				<text><![CDATA[Balance General]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="164" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="100" height="15" uuid="dcb23654-8474-4eb3-8ffd-3b7fb6d4ba5d"/>
+				<textElement>
+					<font fontName="Arial" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Activo]]></text>
+			</staticText>
+			<componentElement>
+				<reportElement key="table 2" x="0" y="17" width="263" height="39" uuid="572cbb92-599b-4d6f-be16-a1324324c419"/>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="Activos Corriente" uuid="41b8da1e-1085-4e2c-9b48-ce80a4ce4052">
+						<datasetParameter name="AC">
+							<datasetParameterExpression><![CDATA[$P{ultimP}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:columnGroup width="160" uuid="3e80c44a-034d-4411-9762-26dc8a6bdc7c">
+						<jr:columnHeader height="17" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="160" height="17" uuid="9535587d-6de6-4133-9118-8542b780c8d6"/>
+								<box leftPadding="0">
+									<pen lineStyle="Solid"/>
+									<topPen lineStyle="Solid"/>
+									<leftPen lineStyle="Solid"/>
+									<bottomPen lineStyle="Solid"/>
+									<rightPen lineStyle="Solid"/>
+								</box>
+								<textElement>
+									<font fontName="Arial" isUnderline="true"/>
+								</textElement>
+								<text><![CDATA[Corriente  ]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:column width="52" uuid="9e1fe76d-8f70-4746-a199-da817b02e6ad">
+							<jr:detailCell height="19" rowSpan="1">
+								<textField>
+									<reportElement style="Detail" x="0" y="0" width="52" height="19" uuid="5bb74e6e-3698-4428-91be-278d25244257"/>
+									<textElement>
+										<font size="9"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{codigo}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="108" uuid="b390cb51-e76c-4b28-9904-7d81d5dac7ca">
+							<jr:detailCell height="19" rowSpan="1">
+								<textField>
+									<reportElement x="0" y="0" width="108" height="19" uuid="82e1d1f5-a62d-40a3-9d33-7ac32f4c47fc"/>
+									<textElement>
+										<font fontName="Arial" size="9"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{nombre}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+					</jr:columnGroup>
+					<jr:column width="60" uuid="d292fc18-c80f-4cd1-bc6b-29b4001f793f">
+						<jr:columnHeader height="17" rowSpan="1"/>
+						<jr:detailCell height="19" rowSpan="1">
+							<textField pattern="$###0.00;$-###0.00">
+								<reportElement x="0" y="0" width="60" height="19" uuid="7c1d2434-8fb8-45b8-adaa-8910999f3ad3"/>
+								<textElement>
+									<font fontName="Arial" size="9"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{monto}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="60" uuid="febe3c6c-5597-4437-afd7-3a7e3fac42b0">
+						<jr:columnHeader height="17" rowSpan="1">
+							<textField evaluationTime="Report" pattern="$###0.00;$-###0.00">
+								<reportElement x="0" y="0" width="60" height="17" uuid="f8e2f77e-38df-430f-aeb1-80a92466f51a"/>
+								<textElement>
+									<font fontName="Arial" isBold="false" isUnderline="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{sumCorriente}]]></textFieldExpression>
+							</textField>
+						</jr:columnHeader>
+						<jr:detailCell height="19" rowSpan="1"/>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+			<componentElement>
+				<reportElement key="table 2" positionType="Float" x="0" y="60" width="263" height="39" uuid="d93dadea-a95b-4b25-b046-957d866e4284"/>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="Activo No corriente" uuid="7767c9ab-48ef-4f03-9716-e42c703673eb">
+						<datasetParameter name="AN">
+							<datasetParameterExpression><![CDATA[$P{ultimP}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:columnGroup width="160" uuid="c41c218e-bfe5-4b37-acc1-6c8796c10d46">
+						<jr:columnHeader height="16" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="160" height="16" uuid="93dc320c-8364-4baa-be84-96b6b55249e4"/>
+								<textElement>
+									<font fontName="Arial" isUnderline="true"/>
+								</textElement>
+								<text><![CDATA[No Corriente]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:column width="52" uuid="d3f9835b-bdcb-4bf8-93f2-ac7f5b3aa494">
+							<jr:detailCell height="17" rowSpan="1">
+								<textField>
+									<reportElement x="0" y="0" width="52" height="17" uuid="31ec8bfb-ee3e-4436-be2c-0d47af5c7ff5"/>
+									<textElement>
+										<font fontName="Arial" size="9"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{codigo}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="108" uuid="1d70d6c8-390e-4adf-8015-7dba695388e8">
+							<jr:detailCell height="17" rowSpan="1">
+								<textField>
+									<reportElement x="0" y="0" width="108" height="17" uuid="ac64834b-051c-49ef-8f7e-fa883bb013b3"/>
+									<textElement>
+										<font fontName="Arial" size="9"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{nombre}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+					</jr:columnGroup>
+					<jr:column width="60" uuid="5cc25139-fd21-46bb-a9c5-2afe3116ef32">
+						<jr:columnHeader height="16" rowSpan="1"/>
+						<jr:detailCell height="17" rowSpan="1">
+							<textField pattern="$###0.00;$-###0.00">
+								<reportElement x="0" y="0" width="60" height="17" uuid="589d9d8f-538f-4c3b-b563-ab55a0aee335"/>
+								<textElement>
+									<font fontName="Arial" size="9"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{monto}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="64" uuid="0b30e7b1-809f-4ed8-8bf6-b68c13916f1a">
+						<jr:columnHeader height="16" rowSpan="1">
+							<textField evaluationTime="Report" pattern="$###0.00;$-###0.00">
+								<reportElement x="0" y="0" width="64" height="16" uuid="a2fd535a-4912-4719-90ec-a94417e1c73b"/>
+								<textElement>
+									<font fontName="Arial" size="9" isUnderline="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{sumNoC}]]></textFieldExpression>
+							</textField>
+						</jr:columnHeader>
+						<jr:detailCell height="17" rowSpan="1"/>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+			<staticText>
+				<reportElement x="276" y="0" width="100" height="15" uuid="71685cca-c00a-4de8-9c80-5562875486bd"/>
+				<textElement>
+					<font fontName="Arial" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Pasivo]]></text>
+			</staticText>
+			<componentElement>
+				<reportElement key="table 2" x="276" y="17" width="263" height="39" uuid="061b7096-7dd8-47e4-8046-4838d392acec"/>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="Pasivo Corriente" uuid="b9bad90c-1420-40e2-b010-2b0d38eb3bc1">
+						<datasetParameter name="PC">
+							<datasetParameterExpression><![CDATA[$P{ultimP}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:columnGroup width="160" uuid="4ca1de9b-082e-497e-bcfc-76956256fbcc">
+						<jr:columnHeader height="15" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="160" height="15" uuid="c6bf3099-5f25-47d8-9158-6e4f414d1d2b"/>
+								<textElement>
+									<font fontName="Arial" isUnderline="true"/>
+								</textElement>
+								<text><![CDATA[Corriente]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:column width="52" uuid="711d5480-de9a-41ec-8ef3-2e96972db809">
+							<jr:detailCell height="15" rowSpan="1">
+								<textField>
+									<reportElement x="0" y="0" width="52" height="15" uuid="fcd514dd-8df5-4c1c-a905-8d1ca3302c5a"/>
+									<textElement>
+										<font fontName="Arial"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{codigo}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="108" uuid="8215d598-8148-4d16-8385-9cbb20e15f82">
+							<jr:detailCell height="15" rowSpan="1">
+								<textField>
+									<reportElement x="0" y="0" width="108" height="15" uuid="3d68a96f-6058-4d7d-a2a4-81969ccf513d"/>
+									<textElement>
+										<font fontName="Arial"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{nombre}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+					</jr:columnGroup>
+					<jr:column width="59" uuid="9e6218db-2879-4603-b597-423cff5486fa">
+						<jr:columnHeader height="15" rowSpan="1"/>
+						<jr:detailCell height="15" rowSpan="1">
+							<textField pattern="$###0.00;$-###0.00">
+								<reportElement x="0" y="0" width="59" height="15" uuid="51abe4f1-e974-4e43-86ae-d7ce31af20aa"/>
+								<textElement>
+									<font fontName="Arial"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{monto}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="60" uuid="1d8a9d55-423e-41b1-a3d1-7e4a22e11b5d">
+						<jr:columnHeader height="15" rowSpan="1">
+							<textField evaluationTime="Report" pattern="$###0.00;$-###0.00">
+								<reportElement x="0" y="0" width="60" height="15" uuid="9bad57f9-c3b8-464a-9fb0-0e43ae22407f"/>
+								<textElement>
+									<font fontName="Arial" isUnderline="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{sumPasC}]]></textFieldExpression>
+							</textField>
+						</jr:columnHeader>
+						<jr:detailCell height="15" rowSpan="1"/>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+			<componentElement>
+				<reportElement key="table 2" positionType="Float" x="276" y="60" width="263" height="39" uuid="5d2a0d74-2492-4ea5-b6af-dc8c78c8013a"/>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="Pasivo No Corriente" uuid="e91a8c1a-cb1e-48f5-9597-13055b2790b6">
+						<datasetParameter name="PN">
+							<datasetParameterExpression><![CDATA[$P{ultimP}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:columnGroup width="160" uuid="d6a2b4d3-d1aa-45d2-a242-6d1afa665747">
+						<jr:columnHeader height="15" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="160" height="15" uuid="0b0b0038-c178-442a-9bbf-86374d3ed8b9"/>
+								<textElement>
+									<font fontName="Arial" isUnderline="true"/>
+								</textElement>
+								<text><![CDATA[No Corriente]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:column width="60" uuid="0d13c033-8392-447d-8a80-707657917dd1">
+							<jr:detailCell height="15" rowSpan="1">
+								<textField>
+									<reportElement x="0" y="0" width="60" height="15" uuid="fd4953af-3c61-42b1-b684-3503c28295f6"/>
+									<textElement>
+										<font fontName="Arial" size="9"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{codigo}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="100" uuid="aa223820-e54a-4d82-97bc-e16927817b21">
+							<jr:detailCell height="15" rowSpan="1">
+								<textField>
+									<reportElement x="0" y="0" width="100" height="15" uuid="4b4e1ecb-ecdb-470e-82f5-2637679dc734"/>
+									<textElement>
+										<font fontName="Arial" size="9"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{nombre}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+					</jr:columnGroup>
+					<jr:column width="60" uuid="2b7e5865-f66f-4ddb-b9b9-aef280ac93d3">
+						<jr:columnHeader height="15" rowSpan="1"/>
+						<jr:detailCell height="15" rowSpan="1">
+							<textField pattern="$###0.00;$-###0.00">
+								<reportElement x="0" y="0" width="60" height="15" uuid="9c3d989d-b51d-4eba-a50c-de1f8998e450"/>
+								<textElement>
+									<font fontName="Arial" size="9"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{monto}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="60" uuid="d9061537-302f-43f6-b983-6fc9fc55759e">
+						<jr:columnHeader height="15" rowSpan="1">
+							<textField evaluationTime="Report" pattern="$###0.00;$-###0.00">
+								<reportElement x="0" y="0" width="60" height="15" uuid="eb499cf6-e190-42db-850d-584fdbdf3fad"/>
+								<textElement>
+									<font fontName="Arial" size="9" isUnderline="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{sumNoCor}]]></textFieldExpression>
+							</textField>
+						</jr:columnHeader>
+						<jr:detailCell height="15" rowSpan="1"/>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+			<staticText>
+				<reportElement positionType="Float" x="276" y="103" width="100" height="15" uuid="80e1dc71-43d5-4af1-8ec0-57e1440343c0"/>
+				<textElement>
+					<font fontName="Arial" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Patrimonio]]></text>
+			</staticText>
+			<componentElement>
+				<reportElement key="table 2" positionType="Float" x="276" y="120" width="263" height="39" uuid="2afb9fed-54d4-4218-b6a6-8fc415a34bf8"/>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="Patrimonio" uuid="6a7f00b2-636b-4666-8af9-d5538aab805d">
+						<datasetParameter name="PA">
+							<datasetParameterExpression><![CDATA[$P{ultimP}]]></datasetParameterExpression>
+						</datasetParameter>
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:columnGroup width="160" uuid="6333c681-9dcf-4155-8587-8dd2183f44d3">
+						<jr:columnHeader height="15" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="160" height="15" uuid="da856532-8fc5-4f30-8861-8a382828a8b1"/>
+								<textElement>
+									<font fontName="Arial" size="9" isUnderline="true"/>
+								</textElement>
+								<text><![CDATA[Capital]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:column width="60" uuid="abf526c9-a15c-4588-8b23-a5e0ab5f78aa">
+							<jr:detailCell height="15" rowSpan="1">
+								<textField>
+									<reportElement x="0" y="0" width="60" height="15" uuid="68b9a3c1-eb05-4951-bec6-6c4085360c68"/>
+									<textElement>
+										<font fontName="Arial" size="9"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{codigo}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+						<jr:column width="100" uuid="26fea314-2784-453d-ac93-6c6b45691ca9">
+							<jr:detailCell height="15" rowSpan="1">
+								<textField>
+									<reportElement x="0" y="0" width="100" height="15" uuid="4c0323b2-dac2-4aa2-943e-c9c79d483ca4"/>
+									<textElement>
+										<font fontName="Arial"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{nombre}]]></textFieldExpression>
+								</textField>
+							</jr:detailCell>
+						</jr:column>
+					</jr:columnGroup>
+					<jr:column width="60" uuid="c817455e-b84e-4aa6-91c1-f20579bd4fd3">
+						<jr:columnHeader height="15" rowSpan="1"/>
+						<jr:detailCell height="15" rowSpan="1">
+							<textField pattern="$###0.00;$-###0.00">
+								<reportElement x="0" y="0" width="60" height="15" uuid="12fbdabb-abe9-4427-9580-765684772fbc"/>
+								<textElement>
+									<font fontName="Arial"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{monto}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="60" uuid="90adf2bd-5790-4161-91b7-b07d44221a72">
+						<jr:columnHeader height="15" rowSpan="1">
+							<textField evaluationTime="Report" pattern="$###0.00;$-###0.00">
+								<reportElement x="0" y="0" width="60" height="15" uuid="cfac1702-2fd8-4e82-a800-dbb30fd964e3"/>
+								<textElement>
+									<font fontName="Arial" size="9" isUnderline="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{sumPatr}]]></textFieldExpression>
+							</textField>
+						</jr:columnHeader>
+						<jr:detailCell height="15" rowSpan="1"/>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+		</band>
+	</columnHeader>
+	<detail>
+		<band/>
+	</detail>
+	<columnFooter>
+		<band height="2" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="20" splitType="Stretch">
+			<line>
+				<reportElement positionType="FixRelativeToBottom" x="0" y="0" width="555" height="1" uuid="4f4e0078-33d7-4bbf-96c3-677b1bd9aa5d"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</graphicElement>
+			</line>
+			<textField>
+				<reportElement style="Column header" x="433" y="0" width="80" height="20" uuid="c4e9acf9-1d6b-4645-a568-413dc1d27f96"/>
+				<textElement textAlignment="Right">
+					<font size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement style="Column header" x="513" y="0" width="40" height="20" uuid="ea126df5-26dd-4bb3-8d1f-fe1802e4a00e"/>
+				<textElement>
+					<font size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement style="Column header" x="0" y="0" width="197" height="20" uuid="99bbd1b7-4e45-4532-b8a6-a6926f0276b0"/>
+				<textElement>
+					<font size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<lastPageFooter>
+		<band height="67">
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement style="Column header" x="0" y="47" width="197" height="20" uuid="584a4c1d-7c41-4d86-abd9-c4f3091c2f84"/>
+				<textElement>
+					<font size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement style="Column header" x="513" y="47" width="40" height="20" uuid="9cc7df9a-be41-40d8-af88-2926859dfa3d"/>
+				<textElement>
+					<font size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Column header" x="433" y="47" width="80" height="20" uuid="08a8d6b9-19e8-4192-aa2d-0098cad08fc2"/>
+				<textElement textAlignment="Right">
+					<font size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Pagina "+$V{PAGE_NUMBER}+" de"]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="410" y="16" width="132" height="1" uuid="87d98410-0256-41d7-bd10-7700e2cf2f79"/>
+			</line>
+			<staticText>
+				<reportElement x="8" y="9" width="13" height="20" uuid="9c15d04e-b344-44dc-b4c7-589f956b5e1e"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[F.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="410" y="20" width="126" height="20" uuid="666d07b2-daaa-4d45-b872-5231e85e9a39"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Representante Legal]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="53" y="20" width="100" height="20" uuid="56e5c921-e1d1-4b44-a6d7-27eee23c2cc5"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Auditor]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="210" y="10" width="13" height="20" uuid="a2fc3d91-7658-4c74-87b2-0e113c8be766"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[F.]]></text>
+			</staticText>
+			<line>
+				<reportElement x="21" y="18" width="132" height="1" uuid="7a91fd9e-56e7-4855-9db7-0167bdfe8751"/>
+			</line>
+			<staticText>
+				<reportElement x="244" y="21" width="100" height="20" uuid="d53e8f58-aef1-46a5-9fa0-5ff0c9894a1a"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Contador]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="397" y="9" width="13" height="20" uuid="cd99dec0-ed95-474f-934e-b07a3ddd800f"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[F.]]></text>
+			</staticText>
+			<line>
+				<reportElement x="223" y="18" width="132" height="1" uuid="126b3973-4501-4d6e-9aac-0e6193aa8b00"/>
+			</line>
+			<line>
+				<reportElement positionType="FixRelativeToBottom" x="0" y="46" width="555" height="1" uuid="292ede2c-f206-4946-8be2-2603aefed2d7"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</graphicElement>
+			</line>
+		</band>
+	</lastPageFooter>
+	<summary>
+		<band height="19" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="100" height="15" uuid="55fb7949-cdec-4b8c-aae9-b54109dcec62"/>
+				<textElement>
+					<font fontName="Arial"/>
+				</textElement>
+				<text><![CDATA[Total Activo:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="276" y="0" width="117" height="15" uuid="5fffa57d-884d-4b98-bb09-98da1bca65b4"/>
+				<text><![CDATA[Pasivo mas Patrimonio:]]></text>
+			</staticText>
+			<textField pattern="$###0.00;$-###0.00">
+				<reportElement x="453" y="0" width="100" height="15" uuid="f16be088-a9a6-4d3a-bc51-903df9b84502"/>
+				<textElement>
+					<font fontName="Arial" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{sumaPasivoPatr}]]></textFieldExpression>
+			</textField>
+			<textField pattern="$###0.00;$-###0.00">
+				<reportElement x="173" y="0" width="100" height="15" uuid="fb0be028-e444-4443-8489-db269b8b200d"/>
+				<textElement>
+					<font fontName="Arial" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{sumActivo}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

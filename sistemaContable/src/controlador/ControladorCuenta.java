@@ -115,6 +115,7 @@ public class ControladorCuenta {
         try {
             this.conexion.abrirConexion();
             Statement st = this.conexion.abrirConexion().createStatement();
+            String a="DELETE FROM estado ";
             st.executeUpdate("DELETE FROM cuenta WHERE codigo='" + codigo + "'");
             conexion.cerrarConexion();
         } catch (Exception e) {
@@ -150,11 +151,9 @@ public class ControladorCuenta {
         try {
             conexion.abrirConexion();
             Statement ps = conexion.abrirConexion().createStatement();
-            String up = "UPDATE cuenta SET codigo='" + cuenta.getCodigo() + "',nombre='" + cuenta.getNombre() + "'"
-                    + ",tiposaldo='" + cuenta.getTipoSaldo() + "',idorden=" + cuenta.getIdOrden() + ",nivel=" + cuenta.getNivel() + ""
-                    + ",tipocuenta='"+cuenta.getTipoCuenta()+"' WHERE codigo=" + cuenta.getId() + "";
+            String up = "UPDATE cuenta SET nombre='"+cuenta.getNombre()+"', tiposaldo='"+cuenta.getTipoSaldo()+"' WHERE codigo='" + cuenta.getCodigo()+ "'";
             ps.executeUpdate(up);
-            conexion.abrirConexion();
+            conexion.cerrarConexion();
         } catch (Exception e) {
             System.out.println("ERROR AL MODIFICAR LA CUENTA " + e);
         }

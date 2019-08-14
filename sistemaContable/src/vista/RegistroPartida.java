@@ -64,7 +64,6 @@ public class RegistroPartida extends javax.swing.JInternalFrame {
         modelo = new DefaultTableModel();
         modelo.addColumn("CODIGO");
         modelo.addColumn("CUENTA");
-        modelo.addColumn("PARCIAL");
         modelo.addColumn("DEBE");
         modelo.addColumn("HABER");
         tabla.setModel(modelo);
@@ -223,7 +222,7 @@ public class RegistroPartida extends javax.swing.JInternalFrame {
         });
 
         tColumna.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        tColumna.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "SELECCIONE", "PARCIAL", "DEBE", "HABER" }));
+        tColumna.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "SELECCIONE", "DEBE", "HABER" }));
         tColumna.setEnabled(false);
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
@@ -452,23 +451,23 @@ public class RegistroPartida extends javax.swing.JInternalFrame {
         tabla.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         tabla.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null}
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
             },
             new String [] {
-                "CODIGO", "CUENTA", "PARCIAL", "DEBE", "HABER"
+                "CODIGO", "CUENTA", "DEBE", "HABER"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false
+                false, false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -504,15 +503,15 @@ public class RegistroPartida extends javax.swing.JInternalFrame {
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(tdebe, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(thaber, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(30, 30, 30))
+                        .addComponent(tdebe, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(thaber, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(28, 28, 28))
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addContainerGap()
                         .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane1)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 518, Short.MAX_VALUE)
                             .addGroup(jPanel4Layout.createSequentialGroup()
                                 .addComponent(jLabel12)
                                 .addGap(18, 18, 18)
@@ -587,6 +586,8 @@ public class RegistroPartida extends javax.swing.JInternalFrame {
         pda = new Partida();
         pda.setNumpartida(Integer.parseInt(tnpartida.getText()));
         tran = new ArrayList();
+        JOptionPane.showMessageDialog(rootPane, "SOLO CUENTAS DE NIVEL 3 PUEDEN SER PARTE DE LAS "
+                + "TRANSACCIONES", "INFORMACION", JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_bNuevaActionPerformed
 
     private void bAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bAgregarActionPerformed
@@ -617,9 +618,10 @@ public class RegistroPartida extends javax.swing.JInternalFrame {
 
     private void bEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bEliminarActionPerformed
         if (cd != "") {
-            modelo.removeRow(Integer.parseInt(cd));
-            totales();
-            cr--;
+            modelo.removeRow(Integer.parseInt(cd));//ELIMINA DE LA TABLA
+            cr--;//BAJA EL INDICIE USADO COMO REFERENCIA DE LAS FILAS EN LA TABLA
+            tran.remove(Integer.parseInt(cd));//BORRA LA TRANSACCION DEL ARREGLO
+            totales();//ACTUALIZA LOS TOTALES
         }
     }//GEN-LAST:event_bEliminarActionPerformed
 
@@ -630,7 +632,7 @@ public class RegistroPartida extends javax.swing.JInternalFrame {
     private void bGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bGuardarActionPerformed
         if (validarB()) {
             Date f = tfecha.getDate();
-            Timestamp fts = new Timestamp(f.getYear(), f.getMonth(), f.getDay(), f.getHours(), f.getMinutes(), f.getSeconds(), f.getSeconds());
+            Timestamp fts  = new Timestamp(f.getTime());
             pda.setFecha(fts);
             String cnc = tConcepto.getText();
             pda.setConcepto(cnc);
@@ -698,7 +700,17 @@ public class RegistroPartida extends javax.swing.JInternalFrame {
             }
         } else {
             if (cexiste(tCuenta.getText()) != "") {
+                if(tCuenta.getText().length() > 3){
                 nCuenta.setText(cexiste(tCuenta.getText()));
+                if ("1107".equals(tCuenta.getText()) || "2105".equals(tCuenta.getText())) {
+                        tiva.setEnabled(false);
+                    } else {
+                        tiva.setEnabled(true);
+                    }
+                }else{
+                JOptionPane.showMessageDialog(rootPane, "SOLO CUENTAS DE NIVEL 3 PUEDEN SER PARTE DE LAS "
+                + "TRANSACCIONES", "INFORMACION", JOptionPane.WARNING_MESSAGE);
+                }
             } else {
                 nCuenta.setText("");
             }
@@ -865,7 +877,7 @@ public class RegistroPartida extends javax.swing.JInternalFrame {
         modelo.setRowCount(cr + 1);
         modelo.setValueAt(tra.getIdcuenta(), cr, 0);
         modelo.setValueAt(cexiste(String.valueOf(tra.getIdcuenta())), cr, 1);
-        for (int i = 0; i <= 3; i++) {
+        for (int i = 0; i <= 2; i++) {
             if (i == tra.getOperacion()) {
                 modelo.setValueAt(df.format(tra.getMonto()), cr, i + 1);
                 if (bnx == 1) {
@@ -929,8 +941,8 @@ public class RegistroPartida extends javax.swing.JInternalFrame {
         double debe = 0;
         double haber = 0;
         for (int i = 0; i < cr; i++) {
-            debe += Double.parseDouble(modelo.getValueAt(i, 3).toString());
-            haber += Double.parseDouble(modelo.getValueAt(i, 4).toString());
+            debe += Double.parseDouble(modelo.getValueAt(i, 2).toString());
+            haber += Double.parseDouble(modelo.getValueAt(i, 3).toString());
         }
         tdebe.setText(df.format(debe));
         thaber.setText(df.format(haber));

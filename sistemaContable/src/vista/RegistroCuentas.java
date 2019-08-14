@@ -218,22 +218,37 @@ public class RegistroCuentas extends javax.swing.JInternalFrame {
             if (controlador.Existe(codigo)) {
                 JOptionPane.showMessageDialog(null, "Ya existe el codigo de esta cuenta");
             } else {
-                nivel = insertarNivel(codigo.length());
+                int longitud = codigo.length();
+                String codiaux = "";
+                if (codigo.charAt(longitud - 1) == 'R') {
+                    longitud = longitud - 1;
+                }
+                for (int ini = 0; ini < longitud; ini++) {
+                    codiaux=codiaux+codigo.charAt(ini);
+                }
+                nivel = insertarNivel(longitud);
                 JOptionPane.showMessageDialog(null, "" + nivel);
                 if (nivel == null) {
                     JOptionPane.showMessageDialog(null, "Nivel invalido");
                 } else {
-                    Integer idOrden = generarOrden(codigo, nivel);
+                    Integer idOrden = generarOrden(codiaux, nivel);
                     if (idOrden == null) {
                         JOptionPane.showMessageDialog(null, "No concuerda con un nivel superior");
                     } else {
                         if (idOrden == 0) {
                             idOrden = null;
                         }
-                        String tipocuenta = generarTipoCuenta(codigo);
-                        Cuenta cuenta = new Cuenta(codigo, nombre, tipoSaldo, 0.0, idOrden, "", nivel, tipocuenta, "no");
-                        // Cuenta cuenta = new Cuenta
-                        controlador.AgregarCuenta(cuenta);
+                        System.out.println("a ver");
+                        if ((nivel >= 3 && codigo.charAt(longitud) == 'R') || (nivel < 3 && codigo.charAt(longitud) != 'R')) {
+                            String tipocuenta = generarTipoCuenta(codigo);
+                            Cuenta cuenta = new Cuenta(codigo, nombre, tipoSaldo, 0.0, idOrden, "", nivel, tipocuenta, "no");
+                            // Cuenta cuenta = new Cuenta
+                            controlador.AgregarCuenta(cuenta);
+                            System.out.println("simon");
+                        } else {
+                            JOptionPane.showMessageDialog(null, "Para poseer R la cuenta debe de ser nivel 3 o superior");
+                        }
+
                     }
                 }
             }

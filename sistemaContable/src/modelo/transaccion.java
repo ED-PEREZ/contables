@@ -9,14 +9,14 @@ package modelo;
  *
  * @author Pérez
  */
-public class transaccion {
+public class Transaccion {
     private int idtransaccion;
     private int idpartida;
     private int idcuenta;
     private double monto;
     private int operacion;
 
-    public transaccion(int idpartida, int idcuenta, double monto, int operacion) {
+    public Transaccion(int idpartida, int idcuenta, double monto, int operacion) {
         this.idtransaccion = 0;
         this.idpartida = idpartida;
         this.idcuenta = idcuenta;
@@ -24,7 +24,7 @@ public class transaccion {
         this.operacion = operacion;
     }
 
-    public transaccion() {
+    public Transaccion() {
     }
 
     public int getIdtransaccion() {
