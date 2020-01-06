@@ -224,7 +224,7 @@ public class RegistroCuentas extends javax.swing.JInternalFrame {
                     longitud = longitud - 1;
                 }
                 for (int ini = 0; ini < longitud; ini++) {
-                    codiaux=codiaux+codigo.charAt(ini);
+                    codiaux = codiaux + codigo.charAt(ini);
                 }
                 nivel = insertarNivel(longitud);
                 JOptionPane.showMessageDialog(null, "" + nivel);
@@ -239,6 +239,7 @@ public class RegistroCuentas extends javax.swing.JInternalFrame {
                             idOrden = null;
                         }
                         System.out.println("a ver");
+                        longitud = longitud - 1;
                         if ((nivel >= 3 && codigo.charAt(longitud) == 'R') || (nivel < 3 && codigo.charAt(longitud) != 'R')) {
                             String tipocuenta = generarTipoCuenta(codigo);
                             Cuenta cuenta = new Cuenta(codigo, nombre, tipoSaldo, 0.0, idOrden, "", nivel, tipocuenta, "no");
